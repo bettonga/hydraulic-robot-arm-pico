@@ -32,7 +32,8 @@ struct pio_program *capture_prog_2;
 #define NL 10
 
 // initialize as global variables
-const double Kp[3] = {130.0,80.0,50.0}; // 150 | 150 | 50
+const double max_error[3] = {10, 10, 30};
+const double Kp[3] = {130.0,60.0,50.0}; // 150 | 150 | 50
 const double Ki[3] = {0.0,0.0,0.0};   // 0 | 0 | 0
 const double Kd[3] = {1.0,1.0,1.0};   // 1 | 1 | 1
 double ANGLE[3] = {0.0,0.0,0.0};
@@ -96,7 +97,7 @@ double sawtooth_deg(double diff) {
 }
 int pid_update(const int id_motor, const int setpoint, const double actual, const double dt) {
   double error = MOT_SIGN[id_motor] *sawtooth_deg(setpoint -actual);
-  error = (error>10) ? 10 : ( (error<-10) ? -10 : error );
+  error = (error>max_error[id_motor]) ? max_error[id_motor] : ( (error<-max_error[id_motor]) ? -max_error[id_motor] : error );
   integral[id_motor] = integral[id_motor] + error*dt;
   double derivative = (error -last_error[id_motor]) /dt;
   last_error[id_motor] = error;
